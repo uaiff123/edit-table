@@ -3,9 +3,15 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-$token = bin2hex(random_bytes(25)); // กรณีอยากใช้ token ป้องกัน CSRF หรือสำหรับลิงก์อื่นๆ
-?>
+require_once('API/connect.php');
 
+if (!empty($_SESSION['id'])) {
+    header("Location: index.php"); 
+    exit();
+}
+
+$token = bin2hex(random_bytes(25));
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -30,10 +36,24 @@ $token = bin2hex(random_bytes(25)); // กรณีอยากใช้ token �
     }
 });
 </script>
+<style>
+.img-container {
+  display: flex;
+  justify-content: center; /* แนวนอนกึ่งกลาง */
+  align-items: center;    /* แนวตั้งกึ่งกลาง */
+  height: 200px;          /* กำหนดความสูง container ตามต้องการ */
+}
+
+</style>
 </head>
 
-<body class="d-flex align-items-center py-4 bg-body-tertiary">
+<body 
+      class="d-flex align-items-center py-4 bg-body-tertiary">
+       
   <main class="form-signin w-100 m-auto">
+    <div class="img-container">
+    <img  style="width:100px; height:100px;" src="img/logodatary.png" alt="11">
+    </div>
     <form id="resetPasswordForm" class="p-3 border rounded bg-white" style="max-width: 400px; margin:auto;">
       <h1 class="h3 mb-3 fw-normal text-center">Reset Password</h1>
 
@@ -41,6 +61,10 @@ $token = bin2hex(random_bytes(25)); // กรณีอยากใช้ token �
         <input type="email" name="email" id="email" class="form-control" placeholder="name@example.com" required />
         <label for="email">Email address</label>
       </div>
+<div class="form-floating mb-3">
+  <input type="password" name="oldPassword" id="oldPassword" class="form-control" placeholder="Old Password" required minlength="8" />
+  <label for="oldPassword">Old Password</label>
+</div>
 
       <div class="form-floating mb-3">
         <input type="password" name="password" id="password" class="form-control" placeholder="New Password" required minlength="8" />

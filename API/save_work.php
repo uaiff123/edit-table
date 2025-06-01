@@ -43,6 +43,6 @@ for ($i = 0; $i < count($work_dates); $i++) {
     }
 }
 
-header("Location: ../table/table.php");
+header("Location: ../index.php?success=1");
 exit;
 ?>

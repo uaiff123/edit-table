@@ -82,7 +82,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           </select>
         </div>
         <div class="d-flex justify-content-between">
-          <a href="black-home.php" class="btn btn-secondary">ย้อนกลับ</a>
+          <a href="../black-home.php" class="btn btn-secondary">ย้อนกลับ</a>
           <button type="submit" class="btn btn-primary">บันทึกการเปลี่ยนแปลง</button>
         </div>
       </form>

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 28, 2025 at 09:18 AM
+-- Generation Time: Jun 01, 2025 at 09:17 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.0.30
 
@@ -41,24 +41,8 @@ CREATE TABLE `edit` (
 --
 
 INSERT INTO `edit` (`id`, `name`, `status`, `email`, `password`, `date_create`) VALUES
-(1, 'admin', 'admin', 'admin@gmail.com', '$2y$10$TB8t0Po/EXIh912759HWhu6Qb01F6wxTV6yd2GV2clf9Eed.Mz43m', '2025-05-28 05:33:16');
-
--- --------------------------------------------------------
-
---
--- Table structure for table `work_history`
---
-
-CREATE TABLE `work_history` (
-  `id` int(11) NOT NULL,
-  `user_id` int(11) NOT NULL,
-  `work_id` int(11) NOT NULL,
-  `old_date` date NOT NULL,
-  `old_detail` varchar(255) NOT NULL,
-  `old_start` time NOT NULL,
-  `old_end` time NOT NULL,
-  `updated_at` datetime NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+(1, 'admin', 'admin', 'admin@gmail.com', '$2y$10$TB8t0Po/EXIh912759HWhu6Qb01F6wxTV6yd2GV2clf9Eed.Mz43m', '2025-05-28 05:33:16'),
+(47, 'bas132', 'user', '1q@gmail.com', '$2y$10$H9j0BnXM.MLzrHRB6PfoS.QmMArGYUG0oiVrteJwFUF6YuBC6BEba', '2025-06-01 17:29:44');
 
 -- --------------------------------------------------------
 
@@ -70,10 +54,17 @@ CREATE TABLE `work_table` (
   `id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
   `work_date` date NOT NULL,
-  `detail` varchar(255) NOT NULL,
+  `detail` text NOT NULL,
   `time_start` time NOT NULL,
   `time_end` time NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `work_table`
+--
+
+INSERT INTO `work_table` (`id`, `user_id`, `work_date`, `detail`, `time_start`, `time_end`) VALUES
+(130, 47, '2025-06-18', 'ไกไกไกไก', '01:28:00', '03:27:00');
 
 --
 -- Indexes for dumped tables
@@ -83,12 +74,6 @@ CREATE TABLE `work_table` (
 -- Indexes for table `edit`
 --
 ALTER TABLE `edit`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indexes for table `work_history`
---
-ALTER TABLE `work_history`
   ADD PRIMARY KEY (`id`);
 
 --
@@ -106,19 +91,13 @@ ALTER TABLE `work_table`
 -- AUTO_INCREMENT for table `edit`
 --
 ALTER TABLE `edit`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=47;
-
---
--- AUTO_INCREMENT for table `work_history`
---
-ALTER TABLE `work_history`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=48;
 
 --
 -- AUTO_INCREMENT for table `work_table`
 --
 ALTER TABLE `work_table`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=132;
 
 --
 -- Constraints for dumped tables

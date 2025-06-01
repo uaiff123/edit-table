@@ -1,110 +1,84 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-
-require_once(__DIR__ . '/API/connect.php');
+session_start();
+require_once('API/connect.php');
 
 if (empty($_SESSION['id'])) {
     header("Location: signin.php");
     exit();
+    $token = bin2hex(random_bytes(25));
 }
-$token = bin2hex(random_bytes(25));
+
 $user_id = $_SESSION['id'];
 
-$sql = "SELECT work_id, old_date, old_detail, old_start, old_end, updated_at 
-        FROM work_history 
-        WHERE user_id = ? 
-        ORDER BY updated_at DESC";
-
+// ดึงข้อมูลงานทั้งหมดของ user นี้
+$sql = "SELECT id, work_date, detail, time_start, time_end FROM work_table WHERE user_id = ?";
 $stmt = $conn->prepare($sql);
-if (!$stmt) {
-    die("Prepare failed: (" . $conn->errno . ") " . $conn->error);
-}
-
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
 $result = $stmt->get_result();
 
-$histories = [];
+$works = [];
 while ($row = $result->fetch_assoc()) {
-    $histories[] = $row;
+    $works[] = $row;
 }
 $stmt->close();
 ?>
 
-<!-- HTML แสดงผลเหมือนเดิม -->
 <!DOCTYPE html>
 <html lang="th">
 <head>
-    <meta charset="UTF-8">
-    <title>ประวัติการแก้ไขงาน</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <script>
-    window.addEventListener('pageshow', function(event) {
-    // เช็คว่าเคยรีเฟรชแล้วรอบนึงไหม
-    if (!sessionStorage.getItem('reloaded')) {
-        sessionStorage.setItem('reloaded', 'true');
-        window.location.reload();
-    } else {
- 
-        sessionStorage.removeItem('reloaded');
-    }
-});
-</script>
-        <link rel="icon" href="img/logodatary.png" type="image/jpeg" sizes="16x16">
-    <style>
-        .card {
-            border-radius: 15px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        }
-        .card-header {
-            background-color: #007bff;
-            color: white;
-            border-radius: 15px 15px 0 0;
-        }
-    </style>
+    <meta charset="UTF-8" />
+    <title>แก้ไขงานของคุณ</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body class="bg-light">
-    <div class="container py-5">
-        <a href="index.php?token=<?= $token ?>" class="btn btn-secondary mb-4">&larr; กลับหน้าแรก</a>
-        <div class="card">
-            <div class="card-header">
-                <h4 class="mb-0">ประวัติการแก้ไขงานของคุณ</h4>
-            </div>
-            <div class="card-body">
-                <?php if (empty($histories)): ?>
-                    <div class="alert alert-info">ไม่มีประวัติการแก้ไขข้อมูล</div>
-                <?php else: ?>
-                    <div class="table-responsive">
-                        <table class="table table-bordered table-hover">
-                            <thead class="table-primary">
-                                <tr>
-                                    <th>#</th>
-                                    <th>ประวัติวันที่</th>
-                                    <th>ประวัติกาารรายละเอียดเดิม</th>
-                                    <th>ประวัติเวลาเริ่มเดิม</th>
-                                    <th>ประวัิติเวลาเริ่มเดิมเ</th>
-                                    <th>เวลาที่แก้ไข</th>
-                                </tr>
-                            </thead>
-                            <tbody >
-                                <?php foreach ($histories as $index => $row): ?>
-                                    <tr>
-                                        <td><?= $index + 1 ?></td>
-                                        <td><?= htmlspecialchars($row['old_date']) ?></td>
-                                        <td><?= htmlspecialchars($row['old_detail']) ?></td>
-                                        <td><?= htmlspecialchars($row['old_start']) ?></td>
-                                        <td><?= htmlspecialchars($row['old_end']) ?></td>
-                                        <td><?= htmlspecialchars($row['updated_at']) ?></td>
-                                    </tr>
-                                <?php endforeach; ?>
-                            </tbody>
-                        </table>
-                    </div>
-                <?php endif; ?>
-            </div>
+<div class="container py-5">
+    <div class="btn btn-primary">
+    <a style="color: white;" href="index.php"> Exit</a>
+</div>
+    <h3>แก้ไขงานของคุณ</h3>
+    <?php if (empty($works)): ?>
+        <div class="alert alert-info">คุณยังไม่มีงานในระบบ</div>
+    <?php else: ?>
+        <div class="table-responsive">
+            <table class="table table-bordered">
+                <thead class="table-primary">
+                    <tr>
+                        <th>ID งาน</th>
+                        <th>วันที่</th>
+                        <th>รายละเอียด</th>
+                        <th>เวลาเริ่ม</th>
+                        <th>เวลาสิ้นสุด</th>
+                        <th>จัดการ</th>
+                    </tr>
+                </thead>
+              <tbody>
+<?php foreach ($works as $work): ?>
+    <tr>
+        <form method="post" action="API/update-work.php">
+            <input type="hidden" name="id" value="<?= $work['id'] ?>">
+            <td><?= $work['id'] ?></td>
+            <td><input type="date" name="work_date" class="form-control" value="<?= $work['work_date'] ?>" required></td>
+            <td><textarea name="detail" class="form-control" required><?= htmlspecialchars($work['detail']) ?></textarea></td>
+            <td><input type="time" name="time_start" class="form-control" value="<?= $work['time_start'] ?>" required></td>
+            <td><input type="time" name="time_end" class="form-control" value="<?= $work['time_end'] ?>" required></td>
+            <td>
+                <div class="d-flex flex-column flex-md-row gap-2">
+                    <button type="submit" class="btn btn-warning btn-sm">บันทึก</button>
+        </form>
+        <form method="post" action="API/delete-work.php" onsubmit="return confirm('คุณแน่ใจว่าต้องการลบงานนี้?');">
+            <input type="hidden" name="id" value="<?= $work['id'] ?>">
+                    <button type="submit" class="btn btn-danger btn-sm">ลบ</button>
+                </div>
+            </td>
+        </form>
+    </tr>
+<?php endforeach; ?>
+</tbody>
+
+            </table>
         </div>
-    </div>
+    <?php endif; ?>
+</div>
 </body>
 </html>

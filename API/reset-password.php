@@ -2,18 +2,17 @@
 session_start();
 require_once('connect.php'); // เชื่อมต่อฐานข้อมูล
 
-// รับค่า POST
 $email = $_POST['email'] ?? '';
+$oldPassword = $_POST['oldPassword'] ?? '';
 $newPassword = $_POST['password'] ?? '';
 
-// ตรวจสอบข้อมูลเบื้องต้น
-if (empty($email) || empty($newPassword)) {
-    echo json_encode(['success' => false, 'message' => 'Email หรือ รหัสผ่านใหม่ ห้ามว่าง']);
+if (empty($email) || empty($oldPassword) || empty($newPassword)) {
+    echo json_encode(['success' => false, 'message' => 'กรุณากรอก Email, รหัสผ่านเก่า และรหัสผ่านใหม่ให้ครบ']);
     exit;
 }
 
-// ตรวจสอบว่า email มีอยู่ในฐานข้อมูลหรือไม่
-$stmt = $conn->prepare("SELECT id FROM edit WHERE email = ?");
+// เช็คว่ามี email นี้ในฐานข้อมูลไหม
+$stmt = $conn->prepare("SELECT password FROM edit WHERE email = ?");
 $stmt->bind_param("s", $email);
 $stmt->execute();
 $result = $stmt->get_result();
@@ -23,15 +22,25 @@ if ($result->num_rows === 0) {
     exit;
 }
 
-// เข้ารหัสรหัสผ่านก่อนบันทึก (แนะนำใช้ password_hash)
-$hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
+$row = $result->fetch_assoc();
+$hashedPassword = $row['password'];
 
-// อัพเดต password
+// ตรวจสอบรหัสผ่านเก่า
+if (!password_verify($oldPassword, $hashedPassword)) {
+    echo json_encode(['success' => false, 'message' => 'รหัสผ่านเก่าไม่ถูกต้อง']);
+    exit;
+}
+
+// แฮชรหัสผ่านใหม่
+$newHashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
+
+// อัพเดตรหัสผ่านใหม่
 $updateStmt = $conn->prepare("UPDATE edit SET password = ? WHERE email = ?");
-$updateStmt->bind_param("ss", $hashedPassword, $email);
+$updateStmt->bind_param("ss", $newHashedPassword, $email);
 
 if ($updateStmt->execute()) {
     echo json_encode(['success' => true, 'message' => 'เปลี่ยนรหัสผ่านเรียบร้อยแล้ว']);
 } else {
     echo json_encode(['success' => false, 'message' => 'เกิดข้อผิดพลาดในการอัพเดตรหัสผ่าน']);
 }
+?>

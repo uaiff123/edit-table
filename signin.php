@@ -5,6 +5,11 @@ if (session_status() === PHP_SESSION_NONE) {
 
 require_once('API/connect.php');
 
+if (!empty($_SESSION['id'])) {
+    header("Location: index.php"); 
+    exit();
+}
+
 $token = bin2hex(random_bytes(25));
 ?>
 <!DOCTYPE html>
@@ -33,9 +38,9 @@ $token = bin2hex(random_bytes(25));
     #messageBox {
       display: none;
       position: fixed;
-      top: 50%;
+      top: 20%;
       left: 50%;
-      margin-top: -400px;
+      margin-top: -100px;
       transform: translate(-50%, -50%);
       background: rgba(0, 0, 0, 0.8);
       color: #fff;
@@ -70,8 +75,8 @@ $token = bin2hex(random_bytes(25));
   <div id="messageBox"></div>
   <main class="form-signin w-100 m-auto">
     <form id="loginform">
-      <img class="mb-4" src="img/logodatary.png" alt="" width="50" height="50" />
-      <h1 class="h3 mb-3 fw-normal">Please Sign In</h1>
+      <img class="mb-4" src="img/logodatary.png" alt="" width="100" height="100" />
+      <h1 class="h3 mb-3 fw-normal">Datary Sign In</h1>
       <div class="space-bar">
         <div class="form-floating">
           <input
@@ -103,8 +108,7 @@ $token = bin2hex(random_bytes(25));
       <br /><br />
       <p>not yet a member ? <a href="signup.php?token=<?= $token ?>">sign up </a></p>
       <p><a href="re-pas.php?token=<?= $token ?>">Forgot your password? </a></p>
-      <br />
-      <p>Don't want to apply for membership <a href="nologin.php?token=<?= $token ?>"> BACK </a></p>
+      <br/>
 
       <p class="mt-5 mb-3 text-body-secondary">&copy; 2025</p>
     </form>
